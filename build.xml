@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<project name="DateField4" basedir="." default="build-library">
+	
+	<!-- identify properties file -->
+	<property file="build.properties"/>
+	
+	<fail>
+        <condition>
+            <not>
+                <isset property="FLEX_HOME" />
+            </not>
+        </condition>
+        Error!
+        You need to set FLEX_HOME prperty (path to Flex SDK)
+        in build.properties file
+        located in the same dir as build.xml!
+        For example:
+        FLEX_HOME = C:\\flex\\sdk\\
+	</fail>
+	        
+    <!-- Set up Flex Ant tasks -->    
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+	
+    <target name="usage">
+        <echo message=""/>
+        <echo message="InputAssist Build Usage"/>
+        <echo message="-----------------------------------"/>
+        <echo message=""/>
+        <echo message="Available targets are:"/>
+        <echo message=""/>                
+        <echo message="build-library     --&gt; Build InputAssist SWC"/>        
+        <echo message="clean             --&gt; Remove all folders created by build script"/>
+        <echo message="init              --&gt; Clean and create build folders"/>
+        <echo message=""/>
+    </target>
+    <!-- Clean Distrib files -->
+    <target name="clean">
+        <!-- Remove all directories created during the build process -->
+        <echo>[clean] Removing the contents of Distrib directory</echo>
+        <delete includeemptydirs="true" failonerror="false">
+            <fileset dir="${dist.loc}" defaultexcludes="false">
+                <include name="**/*"/>
+            </fileset>
+        </delete>
+        <echo>[clean] The contents of Distrib directory are removed</echo>
+    </target>
+    <!-- Create directories needed for the build process -->
+    <target name="init" depends="clean">
+        <echo>[init] Creating Bin directory</echo>
+        <mkdir dir="${bin.loc}"/>        
+        <echo>[init] Bin directory is created</echo>
+    </target>
+
+    <!-- Compile InputAssist SWC with a versioned name.-->	
+	<target name="build-library" depends="init">
+	        <echo>[build-core] Compiling DateField4 SWC</echo>
+	        <echo>[build-core] Using Flex SDK at: ${FLEX_HOME}</echo>       
+	        <compc output="${bin.loc}/${project.name.versioned}.swc">	        	
+	        	<namespace uri="http://www.jabbypanda.com/2010/controls" manifest="${basedir}/manifest.xml" />
+	        	<namespace uri="library://ns.adobe.com/flex/spark" manifest="${FLEX_HOME}/frameworks/spark-manifest.xml"/>    
+	        	<namespace uri="http://ns.adobe.com/mxml/2009" manifest="${FLEX_HOME}/frameworks/mxml-2009-manifest.xml"/> 
+	        	<namespace uri="http://www.adobe.com/2006/mxml" manifest="${FLEX_HOME}/frameworks/mxml-manifest.xml"/>
+	        	<include-namespaces>http://www.jabbypanda.com/2010/controls</include-namespaces>
+	        	<include-file name="manifest.xml" path="${basedir}/manifest.xml"/>
+	            <source-path path-element="${basedir}/src"/>
+	        	<include-sources dir="${basedir}/src" includes="*"/>
+	        	<debug>false</debug>
+	        	<external-library-path file="${FLEX_HOME}/frameworks/libs/framework.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/flex.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/spark.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/sparkskins.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/textLayout.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/rpc.swc"/>
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/utilities.swc"/>                	        	
+                <external-library-path file="${FLEX_HOME}/frameworks/libs/player/10.0/playerglobal.swc"/>
+	        </compc>
+	    </target>	
+    <!-- Package the Build -->
+    <target name="package">
+        <tstamp>
+            <format property="touch.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <!-- Assemble  -->
+        <echo>[package] Packaging Release</echo>
+        <mkdir dir="${dist.loc}"/>                
+        <copy file="${bin.loc}/${project.name.versioned}.swc" todir="${dist.loc}"/>                
+        <!-- Copy README  -->
+        <copy file="${template.loc}/README.tmpl" tofile="${dist.loc}/README" overwrite="true">
+            <filterchain>
+                <replacetokens>
+                    <token key="date" value="${touch.time}"/>
+                    <token key="libraryVersion" value="${DateField4.ver.num}"/>
+                    <token key="releaseName" value="${project.name.versioned}"/>
+                    <token key="dateField4SourceLink" value="${DateField4.project.sourceLink}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+        <!-- Copy LICENSE  -->
+        <copy file="LICENSE" todir="${dist.loc}" overwrite="true"/>
+        <!-- Zip It  -->
+        <zip destfile="${dist.loc}/${project.name.versioned}.zip">
+            <fileset dir="${dist.loc}"/>
+        </zip>
+        <!-- Clean Up  -->
+        <delete file="${dist.loc}/${project.name.versioned}.swc"/>
+        <delete file="${dist.loc}/README"/>
+        <delete file="${dist.loc}/LICENSE"/>                
+        <echo>[package] Release packaged successfully</echo>
+    </target>
+</project>

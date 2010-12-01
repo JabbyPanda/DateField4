@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<componentPackage>    
+    <component id="DateField4" class="com.jabbypanda.controls.DateField4"/>
+</componentPackage> 

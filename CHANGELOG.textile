@@ -1,0 +1,24 @@
+v0.5
+
+[*] Always enabled much improved custom validator for editable DateField that fully supports i18n dates
+
+[*] Limiting the data entry to "allowedFormatChars" value + numeric chars for editable DateField
+
+[*] Added "autoShowDropDown" property that controls when dropDown DateChooser menu is displayed
+
+[*] Pressing ESCAPE key resets the date selection to the previous value befor DateField control had obtained a focus
+
+[*] Improved keyboard navigation for dropDown DateChooser menu when DateField is editable: RIGHT, LEFT, UP, DOWN, PAGE_UP, PAGE_DOWN key strokes are supported
+ 
+[!] Fixed SDK-23069 https://bugs.adobe.com/jira/browse/SDK-23069
+ [Localization]: DateFormatter.parseDateString does not support non-latin characters in month and days names
+ 
+[!] Fixed SDK-23075 https://bugs.adobe.com/jira/browse/SDK-23075
+    "[Localization]: DateField should support "MMM" and "MMMM" for formatString" 
+
+[!] Fixed SDK-26715 bug https://bugs.adobe.com/jira/browse/SDK-26715 
+   "DateFormatter "parseDateString" method cannot parse dateString value formatted with non default en_US format"
+
+[!] Default width of DateField is wider by 4px to correctly display selected Date when moving cursor caret to the end of the text 
+
+   
