@@ -2,7 +2,7 @@ package com.jabbypanda.controls {
     
     import com.jabbypanda.events.ItemEditEvent;
     import com.jabbypanda.utils.DateUtil;
-    import com.jabbypanda.validators.DateRangeValidator;
+    import com.jabbypanda.validators.DateI18nValidator;
     
     import flash.events.Event;
     import flash.events.FocusEvent;
@@ -16,6 +16,7 @@ package com.jabbypanda.controls {
     import mx.events.CalendarLayoutChangeEvent;
     import mx.events.FlexEvent;
     import mx.formatters.DateFormatter;
+    import mx.validators.DateValidator;
         
     use namespace mx_internal;
     
@@ -25,9 +26,9 @@ package com.jabbypanda.controls {
     [Event(name='itemDataChange', type='com.jabbypanda.events.ItemEditEvent')]
     public class DateField4 extends DateField {
         
-        private var dateFormatter : DateFormatter;
+        protected var dateFormatter : DateFormatter;
         
-        private var dateValidator : DateRangeValidator;
+        protected var dateValidator : DateValidator;
         
         public function DateField4() {
             super();
@@ -39,9 +40,7 @@ package com.jabbypanda.controls {
             
             labelFunction = displayDate;
             parseFunction = DateUtil.parseStringToDate;
-                        
-            dateFormatter = new DateFormatter();           
-            
+                                    
             this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn);
             this.addEventListener(FlexEvent.ENTER, onEnterKeyPressed);
             this.addEventListener(CalendarLayoutChangeEvent.CHANGE, onChangeDate);
@@ -57,17 +56,22 @@ package com.jabbypanda.controls {
             invalidateProperties();
         }
         
-        override protected function resourcesChanged():void {
-            super.resourcesChanged();
+        override public function set formatString(value:String):void {
+            super.formatString = value;
+            
+            if (!dateFormatter) {
+                dateFormatter = new DateFormatter();                
+            }
+            
+            dateFormatter.formatString = value;
             
             if (!dateValidator) {
-                dateValidator = new DateRangeValidator();
-                dateValidator.source = this;
-                dateValidator.property = "text";
-                dateValidator.triggerEvent = "itemDataChange";
+                dateValidator = createDateValidator();                
             }
-                        
-            restrict = dateValidator.allowedFormatChars + '0-9';            
+            
+            dateValidator.inputFormat = formatString;
+            
+            restrict = DateUtil.getAllowedDateInputChars(formatString);
         }
                 
         override protected function measure():void
@@ -159,6 +163,16 @@ package com.jabbypanda.controls {
             dispatchEvent(
                 new ItemEditEvent(ItemEditEvent.DATA_CHANGE, true)                    
             );
+        }
+        
+        private function createDateValidator() : DateI18nValidator{
+            var dateValidator : DateI18nValidator = new DateI18nValidator();
+            dateValidator.source = this;
+            dateValidator.property = "text";
+            dateValidator.triggerEvent = "itemDataChange";
+            dateValidator.inputFormat = formatString;
+            
+            return dateValidator;
         }
         
         private function displayDate(item : Date) : String {

@@ -5,85 +5,41 @@ package com.jabbypanda.validators {
     import mx.formatters.DateFormatter;
     import mx.resources.IResourceManager;
     import mx.resources.ResourceManager;
+    import mx.utils.ArrayUtil;
     import mx.utils.ObjectUtil;
     import mx.utils.StringUtil;
     import mx.validators.DateValidator;
     import mx.validators.ValidationResult;
+     
+    [ResourceBundle("SharedResources")]
+    [ResourceBundle("formatters")]
+    [ResourceBundle("validators")]
+    public class DateI18nValidator extends DateValidator {        
         
-    public class DateRangeValidator extends DateValidator {        
-
-        public static const MIN_YEAR_VALUE : int = 1900;
-        
-        public static const MAX_YEAR_VALUE : int = 9999;
-        
-        public function DateRangeValidator() {
+        public function DateI18nValidator() {
             super();
         }
         
-        public function get minValue() : Date {
-            return _minValue;
+        override protected function doValidation(value:Object):Array {
+            return DateI18nValidator.validateDate(this, value, null);
         }
-        
-        public function set minValue(value:Date):void {         
-            _minValue = value; 
-        }
-        
-        public function get maxValue() : Date {
-            return _maxValue;
-        }
-        
-        public function set maxValue(value : Date) : void {         
-            _maxValue = value; 
-        }
-        
-        private var _exceedsMaxErrorOverride:String;
-        
-        [Inspectable(category="Errors", defaultValue="max error")]
-        public function get exceedsMaxError() : String {
-            return _exceedsMaxError;
-        }
-        
-        
-        public function set exceedsMaxError(value:String):void {
-            _exceedsMaxErrorOverride = value;            
-            
-            _exceedsMaxError = value != null ?
-                value : resourceManager.getString(
-                    "OdysseyValidators", "exceedsMaxDateError");
-        }
-        
-        private var _lowerThanMinErrorOverride : String;
-        
-        [Inspectable(category="Errors", defaultValue="min error")]
-        public function get lowerThanMinError() : String {
-            return _lowerThanMinError;
-        }
-        
-        public function set lowerThanMinError(value : String) : void {            
-            _lowerThanMinErrorOverride = value;
-            
-            _lowerThanMinError = value != null ?
-                value :
-                resourceManager.getString(
-                    "OdysseyValidators", "lowerThanMinDateError");
-        }
-        
+                
         // accepts only values of String or Date types
-        public static function validateDateRange(validator : DateRangeValidator,
+        public static function validateDate(validator : DateI18nValidator,
                                                  value : Object,
                                                  baseField : String):Array {
+                        
             var results:Array = [];
                         
             // Resource-backed properties of the validator.
-            var allowedFormatChars:String = validator.allowedFormatChars;
-            var inputFormat:String = validator.inputFormat;            
+            var allowedFormatChars : String = validator.allowedFormatChars;
+            var inputFormat : String = validator.inputFormat;
+            var dateSeparator : String;
+            var inputFormatsArray : Array;
             
-            var resourceManager:IResourceManager = ResourceManager.getInstance();
+            var resourceManager : IResourceManager = ResourceManager.getInstance();
             
-            var validInput:String = DECIMAL_DIGITS + allowedFormatChars;
-            
-            var maxValue:Date = validator.maxValue;
-            var minValue:Date = validator.minValue;
+            var validInput : String = DateUtil.getAllowedDateInputChars(inputFormat);
                         
             var dayProp:String = baseField;
             var yearProp:String = baseField;
@@ -101,7 +57,6 @@ package com.jabbypanda.validators {
             
             var n:int;
             var i:int;
-            var temp:String;
             
             if (value is String) {
                 stringValue = String(value)
@@ -109,8 +64,22 @@ package com.jabbypanda.validators {
                 stringValue = (value as Date).toDateString();
             }
             
+            dateSeparator = DateUtil.getDateSeparator(stringValue, inputFormat);   
+            
+            if (!dateSeparator) {
+                var dateSeparatorInvalid : ValidationResult = new ValidationResult(
+                    true, baseField, "format",
+                    validator.formatError);
+                
+                results.push(dateSeparatorInvalid);
+                return results;
+            }
+            
+            inputFormatsArray = DateUtil.getInputFormatArray(dateSeparator, inputFormat);
+               
             // Check each character to see if it is allowed.
-            n = stringValue.length;            
+            n = stringValue.length;                        
+            
             for (i = 0; i < n; i++) {                                
                 if (validInput.indexOf(stringValue.charAt(i)) == -1) {
                     results.push(new ValidationResult(
@@ -119,9 +88,9 @@ package com.jabbypanda.validators {
                     return results;
                 }                
             }
-            
-            var validDateStringResult : ValidationResult = DateRangeValidator.validateFormatString(
-                validator, inputFormat, baseField);
+                         
+            var validDateStringResult : ValidationResult = 
+                DateI18nValidator.validateFormatString(validator, dateSeparator, inputFormatsArray, baseField);
             
             //Check format string itself
             if (validDateStringResult != null) {
@@ -246,107 +215,58 @@ package com.jabbypanda.validators {
                 return results;
             }
             
-            if (yearRequired && (yearNum > MAX_YEAR_VALUE || yearNum < MIN_YEAR_VALUE)) {
+            if (yearRequired && isNaN(yearNum)) {
                 results.push(new ValidationResult(
                     true, yearProp, "wrongYear",
                     validator.wrongYearError));
                 return results;
             } 
             
-            if (minValue) {                        
-                var minValidatonResultObj : ValidationResult = validateMinValue(validator, minValue, objValue);
-                if (minValidatonResultObj) {
-                    results.push(minValidatonResultObj);
-                    return results;
-                }
-            }
-            
-            if (maxValue) {
-                var maxValidatonResultObj : ValidationResult = validateMaxValue(validator, maxValue, objValue);
-                if (maxValidatonResultObj) {
-                    results.push(maxValidatonResultObj);
-                    return results;
-                }
-            }
-            
             return results;
         }
                 
-        private static function validateMinValue(validator : DateRangeValidator, minValue : Date, objValue : Object) : ValidationResult {
-            var dateValue : Date = new Date(objValue.year, objValue.month - 1, objValue.day);
-            var minValueWithoutDayTime : Date = new Date(minValue.fullYear, minValue.month, minValue.date);
-            if (ObjectUtil.dateCompare(minValueWithoutDayTime, dateValue) == 1) {                
-                return new ValidationResult(
-                    true, null, "lowerThanMin",
-                    validator.lowerThanMinError);                    
-            }                
-            return null;                                    
-        }
-        
-        private static function validateMaxValue(validator : DateRangeValidator, maxValue : Date, objValue : Object) : ValidationResult {
-            var dateValue : Date = new Date(objValue.year, objValue.month - 1, objValue.day);
-            var maxValueWithoutDayTime : Date = new Date(maxValue.fullYear, maxValue.month, maxValue.date);
-            if (ObjectUtil.dateCompare(dateValue, maxValueWithoutDayTime) == 1) {                
-                return new ValidationResult(
-                    true, null, "exceedsMax",
-                    validator.exceedsMaxError);                    
-            }
-            
-            return null;
-        }
-        
         /**
          *  @private
          */
-        private static function validateFormatString(
-            validator:DateRangeValidator,
-            format:String,
-            baseField:String):ValidationResult {
-            var monthCounter:Number = 0;
-            var dayCounter:Number = 0;
-            var yearCounter:Number = 0;
+        private static function validateFormatString(validator : DateI18nValidator,
+                                                        separatorSign : String,
+                                                        formatPartsArray : Array,
+                                                        baseField : String) : ValidationResult {
             
-            var n:int = format.length;
-            for (var i:int = 0; i < n; i++) {
-                var mask:String = "" + format.substring(i, i + 1);
-                
-                // Check for upper and lower case to maintain backwards compatibility.
-                if (mask == "m" || mask == "M") {
-                    monthCounter++;
-                } else if (mask == "d" || mask == "D") {
-                    dayCounter++;
-                } else if (mask == "y" || mask == "Y") {
-                    yearCounter++;
-                }
-            }
+            var formatPartsValidationObject : Object = {dayValid : false,
+                                                        monthValid : false,
+                                                        yearValid : false};
+            var formatsLength : int = formatPartsArray.length; 
             
-            if ((monthCounter == 2 || monthCounter == 1 &&
-                (yearCounter == 2 || yearCounter == 4)) ||
-                ((monthCounter == 2 || monthCounter == 1) && 
-                 (dayCounter == 2 || dayCounter == 1) &&
-                 (yearCounter == 0 || yearCounter == 2 || yearCounter == 4))) {
+            var mask:String;            
+            for (var i : int  = 0; i < formatsLength; i++) {
+                mask = formatPartsArray[i];                
+                switch (mask) {
+                    case "M" :
+                    case "MM" :
+                    case "MMM" :                        
+                    case "MMMM" :
+                        formatPartsValidationObject.monthValid = true;
+                        break;
+                    case "YY" :
+                    case "YYYY" :
+                        formatPartsValidationObject.yearValid = true;
+                        break;                    
+                    case "D" :
+                    case "DD" :                    
+                        formatPartsValidationObject.dayValid = true;                        
+                        break;                        
+                }    
+            }           
+            if (formatPartsValidationObject.monthValid && 
+                formatPartsValidationObject.dayValid &&
+                formatPartsValidationObject.yearValid) {
                 return null; // Passes format validation
             } else {
                 return new ValidationResult(
                     true, baseField, "format",
                     validator.formatError);
             }
-        }
-        
-        override protected function resourcesChanged() : void {
-            super.resourcesChanged();
-            
-            lowerThanMinError = _lowerThanMinErrorOverride;
-            exceedsMaxError = _exceedsMaxErrorOverride;
-        }
-        
-        private var _minValue : Date;
-        
-        private var _maxValue : Date;
-        
-        private var _exceedsMaxError : String;
-        
-        private var _lowerThanMinError : String;
-        
+        }        
     }
 }
