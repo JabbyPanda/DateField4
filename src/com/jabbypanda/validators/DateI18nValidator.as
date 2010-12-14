@@ -31,8 +31,7 @@ package com.jabbypanda.validators {
                         
             var results:Array = [];
                         
-            // Resource-backed properties of the validator.
-            var allowedFormatChars : String = validator.allowedFormatChars;
+            // Resource-backed properties of the validator.            
             var inputFormat : String = validator.inputFormat;
             var dateSeparator : String;
             var inputFormatsArray : Array;
@@ -75,8 +74,7 @@ package com.jabbypanda.validators {
                 return results;
             }
             
-            inputFormatsArray = DateUtil.getInputFormatArray(dateSeparator, inputFormat);
-               
+                           
             // Check each character to see if it is allowed.
             n = stringValue.length;                        
             
@@ -88,7 +86,9 @@ package com.jabbypanda.validators {
                     return results;
                 }                
             }
-                         
+            
+            inputFormatsArray = DateUtil.getInputFormatArray(dateSeparator, inputFormat);
+            
             var validDateStringResult : ValidationResult = 
                 DateI18nValidator.validateFormatString(validator, dateSeparator, inputFormatsArray, baseField);
             

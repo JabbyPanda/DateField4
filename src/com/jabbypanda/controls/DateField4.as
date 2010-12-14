@@ -41,9 +41,9 @@ package com.jabbypanda.controls {
             labelFunction = displayDate;
             parseFunction = DateUtil.parseStringToDate;
                                     
-            this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn);
-            this.addEventListener(FlexEvent.ENTER, onEnterKeyPressed);
             this.addEventListener(CalendarLayoutChangeEvent.CHANGE, onChangeDate);
+            this.addEventListener(FlexEvent.ENTER, onEnterKeyPressed);
+            this.addEventListener(FocusEvent.FOCUS_IN, onFocusIn);
         }
         
         public function get autoShowDropDown() : Boolean {
@@ -52,8 +52,6 @@ package com.jabbypanda.controls {
                 
         public function set autoShowDropDown(value : Boolean) : void {
             _autoShowDropDown = value;
-            _autoShowDropDownChanged = true;
-            invalidateProperties();
         }
         
         override public function set formatString(value:String):void {
@@ -73,9 +71,19 @@ package com.jabbypanda.controls {
             
             restrict = DateUtil.getAllowedDateInputChars(formatString);
         }
-                
-        override protected function measure():void
-        {
+        
+        override public function open() : void {
+            _lastSelectedDate = selectedDate;
+            super.open();
+        }
+        
+        override protected function createChildren():void {
+            super.createChildren();            
+                                    
+            textInput.addEventListener(Event.CHANGE, onTextInputChange);
+        }
+        
+        override protected function measure() : void {
             // skip base class, we do our own calculation here
             // super.measure();
             
@@ -91,37 +99,28 @@ package com.jabbypanda.controls {
             measuredMinHeight = measuredHeight = textInput.getExplicitOrMeasuredHeight();
         }
         
-        override public function open() : void {
-            _lastSelectedDate = selectedDate;
-            super.open();
-        }
-        
-        override protected function commitProperties():void {
-            super.commitProperties();
-            
-            if (_autoShowDropDownChanged) {
-                _autoShowDropDownChanged = false;
-            }    
-        }
-        
-        override protected function createChildren():void {
-            super.createChildren();            
-                                    
-            textInput.addEventListener(Event.CHANGE, onTextInputChange);
-        }
-        
         override protected function textInput_changeHandler(event : Event) : void {
-            super.textInput_changeHandler(event);            
+            var inputDate : Date = DateUtil.parseStringToDate(textInput.text, formatString);
+            
+            if (!inputDate) {
+                _selectedDateReset = true;                
+            }
+            
+            selectedDate = inputDate;
             
             if (selectedDate) {
                 dropdown.selectedDate = selectedDate;
-            }            
+            } else {
+                dropdown.selectedDate = null;
+            }
+            
+            super.textInput_changeHandler(event);            
         }
+        
         
         override protected function keyDownHandler(event : KeyboardEvent) : void {
             if (event.keyCode == Keyboard.DELETE || 
                 event.keyCode == Keyboard.BACKSPACE ||
-                event.keyCode == Keyboard.SPACE ||
                 event.keyCode == Keyboard.ENTER) {
                 return;
             } 
@@ -165,7 +164,7 @@ package com.jabbypanda.controls {
             );
         }
         
-        private function createDateValidator() : DateI18nValidator{
+        private function createDateValidator() : DateI18nValidator {
             var dateValidator : DateI18nValidator = new DateI18nValidator();
             dateValidator.source = this;
             dateValidator.property = "text";
@@ -176,7 +175,12 @@ package com.jabbypanda.controls {
         }
         
         private function displayDate(item : Date) : String {
-            return dateFormatter.format(item);
+            if (!_selectedDateReset) {
+                return dateFormatter.format(item);
+            } else {
+                _selectedDateReset = false;                
+                return text;
+            }
         }
         
         private function resetTextSelection() : void {
@@ -204,13 +208,13 @@ package com.jabbypanda.controls {
             changeEvent.newDate = selectedDate;
             changeEvent.triggerEvent = event;
             dispatchEvent(changeEvent);
-        }
-        
+        }        
                 
-        private var _lastSelectedDate : Date;
-        
         private var _autoShowDropDown : Boolean = true;
         
-        private var _autoShowDropDownChanged : Boolean;
+        private var _lastSelectedDate : Date;
+        
+        private var _selectedDateReset : Boolean;
+        
     }
 }
