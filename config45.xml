@@ -1,0 +1,28 @@
+<flex-config>
+    <compiler>
+        <locale>
+            <locale-element>en_US</locale-element>
+            <locale-element>de_DE</locale-element>
+            <locale-element>fr_FR</locale-element>
+            <locale-element>it_IT</locale-element>
+            <locale-element>ru_RU</locale-element>
+            <locale-element>zh_CN</locale-element>            
+        </locale>
+        <source-path>
+            <path-element>src</path-element>
+            <path-element>${FLEX_HOME}/frameworks/projects/framework/bundles/{locale}</path-element>
+        </source-path>
+        <incremental>true</incremental>        
+        <accessible>true</accessible>
+        <debug>false</debug>
+        <optimize>true</optimize>
+        <strict>true</strict>
+        <external-library-path>
+            <path-element>${flexlib}/libs/player/{targetPlayerMajorVersion}.{targetPlayerMinorVersion}/playerglobal.swc</path-element>
+            <path-element>${flexlib}/libs/framework.swc</path-element>
+            <path-element>${flexlib}/libs/mx/mx.swc</path-element>
+            <path-element>${flexlib}/libs/spark.swc</path-element>            
+            <path-element>${flexlib}/libs/textLayout.swc</path-element>                        
+        </external-library-path>        
+    </compiler>        
+</flex-config>
