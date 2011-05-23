@@ -9,8 +9,7 @@
             <locale-element>zh_CN</locale-element>            
         </locale>
         <source-path>
-            <path-element>src</path-element>
-            <path-element>${FLEX_HOME}/frameworks/projects/framework/bundles/{locale}</path-element>
+            <path-element>src</path-element>            
         </source-path>
         <incremental>true</incremental>        
         <accessible>true</accessible>
@@ -21,7 +20,8 @@
             <path-element>${flexlib}/libs/player/{targetPlayerMajorVersion}.{targetPlayerMinorVersion}/playerglobal.swc</path-element>
             <path-element>${flexlib}/libs/framework.swc</path-element>            
             <path-element>${flexlib}/libs/spark.swc</path-element>            
-            <path-element>${flexlib}/libs/textLayout.swc</path-element>                        
+            <path-element>${flexlib}/libs/textLayout.swc</path-element>
+            <path-element>${flexlib}/locale/{locale}</path-element>                         
         </external-library-path>        
     </compiler>        
 </flex-config>
