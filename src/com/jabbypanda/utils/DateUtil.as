@@ -53,6 +53,10 @@ package com.jabbypanda.utils {
             var dateSeparator : String;            
             var i : int;
             
+            if (!allowedFormatChars) {
+                return '';
+            }
+            
             var l : int = allowedFormatChars.length;
             for (i = 0; i < l; i++) {
                 var allowedFormatChar : String = allowedFormatChars.charAt(i);
