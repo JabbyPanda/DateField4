@@ -16,6 +16,8 @@ package com.jabbypanda.utils {
         
         public static const DECIMAL_DIGITS : String = "0123456789";
         
+        protected static const BEGIN_CURRENT_CENTURY_YEAR : Number = 2000;
+        
         public static var resourceManager : IResourceManager = ResourceManager.getInstance();
                                 
         public static function getInputFormatArray(dateSeparator: String, inputFormat : String) : Array {
@@ -102,6 +104,7 @@ package com.jabbypanda.utils {
                     case "M" :
                     case "MM" :
                         dateObject.month = valuesArray[i];
+                        break;
                     case "MMM" :                        
                         var monthNamesShort : String = resourceManager.getString("formatters", "monthNamesShort");
                         var monthNamesShortArray : Array = monthNamesShort.split(",");
@@ -127,11 +130,19 @@ package com.jabbypanda.utils {
                         }
                         break;
                     case "YY" :
+                        var yearTwoDigitsValue : String = valuesArray[i] as String;
+                        if (yearTwoDigitsValue.length == mask.length) {
+                            dateObject.year = BEGIN_CURRENT_CENTURY_YEAR + Number(yearTwoDigitsValue);
+                        } else {
+                            dateObject.year = NaN;
+                        }
                         break;
                     case "YYYY" :
                         var yearValue : String = valuesArray[i] as String;
-                        if (yearValue.length == mask.length) { 
+                        if (yearTwoDigitsValue.length == mask.length) {
                             dateObject.year = valuesArray[i];
+                        } else {
+                            dateObject.year = NaN;
                         }
                         break;                    
                     case "D" :

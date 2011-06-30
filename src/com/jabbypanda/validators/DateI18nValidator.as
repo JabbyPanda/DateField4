@@ -133,11 +133,12 @@ package com.jabbypanda.validators {
             } else {
                 monthRequired = true;
             }
-            
-            if (isNaN(objValue.year)) {
+                        
+            if (isNaN(objValue.year)) {                
+                //TODO : Create separate resource string for this type of error
                 results.push(new ValidationResult(
-                    true, yearProp, "wrongYear",
-                    validator.wrongYearError));
+                    true, yearProp, "wrongLength",
+                    validator.wrongLengthError + " " + inputFormat));
             } else if (validator.required && (!objValue.year || objValue.year == "")) {
                 results.push(new ValidationResult(
                     true, yearProp, "requiredField",
@@ -170,6 +171,7 @@ package com.jabbypanda.validators {
             }
                                                   
             var len : Number = stringValue.length;
+            
             // 2 - maximum length of separators
             if (len + 2 < inputFormat.length) {
                 results.push(new ValidationResult(
