@@ -139,7 +139,7 @@ package com.jabbypanda.utils {
                         break;
                     case "YYYY" :
                         var yearValue : String = valuesArray[i] as String;
-                        if (yearTwoDigitsValue.length == mask.length) {
+                        if (yearValue.length == mask.length) {
                             dateObject.year = valuesArray[i];
                         } else {
                             dateObject.year = NaN;
