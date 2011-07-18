@@ -1,0 +1,11 @@
+# Compiled source
+
+*.swc
+
+# Bin folder
+bin/
+
+# Generated build files #
+######################
+.externalToolBuilders/
+.settings/

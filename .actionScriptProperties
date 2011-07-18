@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties analytics="false" mainApplicationPath="DateField35.as" projectUUID="edcb7bc1-ae7e-4d3f-aa38-707d8cef5b2c" version="7">
-  <compiler additionalCompilerArguments="-locale en_US de_DE fr_FR it_IT ru_RU zh_CN" autoRSLOrdering="true" copyDependentFiles="false" flexSDK="Flex 4.1.0" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+<actionScriptProperties analytics="false" mainApplicationPath="DateField35.as" projectUUID="edcb7bc1-ae7e-4d3f-aa38-707d8cef5b2c" version="10">
+  <compiler additionalCompilerArguments="-locale en_US de_DE fr_FR it_IT ru_RU zh_CN" autoRSLOrdering="true" copyDependentFiles="false" flexSDK="Flex 4.5" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">

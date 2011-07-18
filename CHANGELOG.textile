@@ -1,3 +1,6 @@
+v0.51
+[*] Added support for "YY" token in date format 
+ 
 v0.5
 
 [*] Always enabled much improved custom validator for editable DateField that fully supports i18n dates
